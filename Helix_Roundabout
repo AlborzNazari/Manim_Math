@@ -1,0 +1,42 @@
+# src/helix/animation.py
+from manim import *
+import numpy as np
+from ..common.camera_utils import ProCamera
+from ..common.math_utils import normalize_vector
+
+class HelixAnimation(ThreeDScene):
+    """3D helix animation with real-time tangent visualization."""
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.helix_config = {
+            'z_scale': 0.2,
+            't_range': [-10, 10],
+            'colors': {
+                'helix': BLUE,
+                'dot': RED,
+                'tangent': YELLOW
+            }
+        }
+
+    def construct(self):
+        # Initialize professional camera setup
+        ProCamera.setup(self, preset='industrial')
+        
+        # Animation components
+        self._create_axes()
+        self._create_helix()
+        self._create_tangent_system()
+        self._animate_system()
+
+    def _parametric_helix(self, t):
+        # ... your helix_func implementation ...
+    
+    def _calculate_tangent(self, t):
+        # ... your tangent_func implementation ...
+    
+    # Split into modular methods
+    def _create_axes(self): ...
+    def _create_helix(self): ...
+    def _create_tangent_system(self): ...
+    def _animate_system(self): ...
