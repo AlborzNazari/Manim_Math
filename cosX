@@ -1,0 +1,94 @@
+from manim import *
+import numpy as np
+
+class HelicalSurface(ThreeDScene):
+    """3D visualization of a helical surface with dynamic equation display."""
+    
+    # Configuration constants
+    CONFIG = {
+        "axes_config": {
+            "x_range": [-4, 4, 1],
+            "y_range": [-3, 3, 1],
+            "z_range": [-3, 3, 1],
+            "x_length": 8,
+            "y_length": 6,
+            "z_length": 6,
+        },
+        "surface_config": {
+            "u_range": [-4, 4],
+            "v_range": [-2, 2],
+            "resolution": (20, 20),
+            "checkerboard_colors": [GREEN_D, GREEN_E]
+        },
+        "camera_config": {
+            "phi": 60 * DEGREES,
+            "theta": 90 * DEGREES
+        }
+    }
+
+    def construct(self):
+        """Main animation sequence."""
+        self._setup_scene()
+        self._create_axes()
+        self._create_surface()
+        self._display_equation()
+        self._animate_components()
+
+    def _setup_scene(self):
+        """Initialize camera and scene settings."""
+        self.set_camera_orientation(**self.CONFIG["camera_config"])
+        self.camera.set_zoom(0.8)
+
+    def _create_axes(self) -> ThreeDAxes:
+        """Create and return 3D axes."""
+        self.axes = ThreeDAxes(**self.CONFIG["axes_config"])
+        return self.axes
+
+    def _surface_function(self, x: float, y: float) -> np.ndarray:
+        """Parametric function defining the helical surface.
+        
+        Args:
+            x: X-coordinate value
+            y: Y-coordinate value
+            
+        Returns:
+            numpy array containing (x, y, z) coordinates
+        """
+        return self.axes.c2p(x, y, y * np.cos(x))
+
+    def _create_surface(self) -> Surface:
+        """Create and return the helical surface."""
+        self.surface = Surface(
+            lambda u, v: self._surface_function(u, v),
+            **self.CONFIG["surface_config"]
+        )
+        return self.surface
+
+    def _display_equation(self) -> MathTex:
+        """Create and display the surface equation."""
+        self.equation = MathTex(r"z = y \cos(x)").to_corner(UL)
+        self.add_fixed_in_frame_mobjects(self.equation)
+        return self.equation
+
+    def _animate_components(self):
+        """Orchestrate the animation sequence."""
+        self.play(
+            LaggedStart(
+                Create(self.axes),
+                FadeIn(self.surface, shift=UP),
+                lag_ratio=0.5
+            ),
+            run_time=2
+        )
+        
+        self.play(
+            DrawBorderThenFill(self.equation),
+            run_time=1.5
+        )
+        
+        self.begin_ambient_camera_rotation(rate=0.15)
+        self.wait(3)
+        self.stop_ambient_camera_rotation()
+        self.wait(1)
+
+# Command to render: manim -pqm helical_surface.py HelicalSurface
