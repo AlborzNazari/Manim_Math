@@ -13,6 +13,6 @@
 
 ## Installation
 ```bash
-git clone https://github.com/AlborzNazari/Torus-Knot-Animation.git
+git clone https://github.com/AlborzNazari/Manim_Math
 cd Torus-Knot-Animation
 pip install -r requirements.txt
