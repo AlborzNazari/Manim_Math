@@ -1,0 +1,67 @@
+from manim import *
+import numpy as np
+
+class TorusKnotAnimation(ThreeDScene):
+    def construct(self):
+        # Set initial camera orientation for a good starting view
+        self.set_camera_orientation(phi=75 * DEGREES, theta=30 * DEGREES)
+
+        # Define parameters for the torus and knot
+        R = 3  # Major radius of the torus
+        r = 1  # Minor radius of the torus
+        p = 2  # Number of times the knot wraps around the torus meridionally
+        q = 3  # Number of times the knot wraps around the torus longitudinally
+
+        # Create 3D axes
+        axes = ThreeDAxes()
+
+        # Create a semi-transparent torus for context
+        torus = Torus(major_radius=R, minor_radius=r).set_fill(BLUE, opacity=0.2)
+
+        # Define the parametric function for the (p,q) torus knot
+        def torus_knot(t):
+            theta = t * TAU  # TAU = 2π, t ranges from 0 to 1
+            x = (R + r * np.cos(q * theta)) * np.cos(p * theta)
+            y = (R + r * np.cos(q * theta)) * np.sin(p * theta)
+            z = r * np.sin(q * theta)
+            return np.array([x, y, z])
+
+        # Create the torus knot curve
+        knot = ParametricFunction(
+            torus_knot,
+            t_range=[0, 1],
+            color=YELLOW,
+            stroke_width=4
+        )
+
+        # Create a dot to trace the knot
+        dot = Dot3D(color=RED)
+
+        # Add all objects to the scene
+        self.add(axes, torus, knot, dot)
+
+        # Set up a ValueTracker to animate the dot's position
+        t_tracker = ValueTracker(0)
+
+        # Define an updater to move the dot along the knot
+        def update_dot(m):
+            t = t_tracker.get_value()
+            pos = torus_knot(t)
+            m.move_to(pos)
+        dot.add_updater(update_dot)
+
+        # Start ambient camera rotation (0.2 radians per second)
+        self.begin_ambient_camera_rotation(rate=0.2)
+
+        # Animate the dot tracing the knot over 10 seconds
+        self.play(
+            t_tracker.animate.set_value(1),
+            run_time=10,
+            rate_func=linear
+        )
+
+        # Stop the camera rotation
+        self.stop_ambient_camera_rotation()
+
+        # Hold the final frame for 2 seconds
+        self.wait(2)
