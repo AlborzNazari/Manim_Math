@@ -1,0 +1,46 @@
+from manim import *
+
+class TrapezoidWithFormula(Scene):
+    def construct(self):
+        # Define trapezoid vertices
+        base1_start = [-2, -1, 0]  # Bottom base start
+        base1_end = [2, -1, 0]     # Bottom base end (longer base)
+        base2_start = [-1, 1, 0]   # Top base start
+        base2_end = [1, 1, 0]      # Top base end (shorter base)
+
+        # Create trapezoid components
+        base1 = Line(base1_start, base1_end, color=BLUE)  # Bottom base
+        base2 = Line(base2_start, base2_end, color=BLUE)  # Top base
+        leg1 = Line(base1_start, base2_start, color=YELLOW)  # Left leg
+        leg2 = Line(base1_end, base2_end, color=YELLOW)     # Right leg
+        height = DashedLine([0, 1, 0], [0, -1, 0], color=GREEN)  # Height (perpendicular)
+
+        # Labels for bases and height
+        base1_label = Tex("a").next_to(base1, DOWN, buff=0.1).scale(0.8)
+        base2_label = Tex("b").next_to(base2, UP, buff=0.1).scale(0.8)
+        height_label = Tex("h").next_to(height, RIGHT, buff=0.1).scale(0.8)
+
+        # Step-by-step animation for trapezoid
+        self.play(Create(base1))
+        self.play(Write(base1_label))
+        self.play(Create(base2))
+        self.play(Write(base2_label))
+        self.play(Create(leg1), Create(leg2))
+        self.play(Create(height))
+        self.play(Write(height_label))
+        self.wait(1)
+
+        # Define and position the formula
+        formula = MathTex(r"\text{Area} = \frac{(a + b)}{2} \cdot h").scale(1.2)
+        formula.move_to(RIGHT * 4)  # Position to the right of the trapezoid
+
+        # Animate the formula appearing
+        self.play(Write(formula))
+        self.wait(2)
+
+        # Fade out everything
+        self.play(
+            FadeOut(base1), FadeOut(base2), FadeOut(leg1), FadeOut(leg2),
+            FadeOut(height), FadeOut(base1_label), FadeOut(base2_label),
+            FadeOut(height_label), FadeOut(formula)
+        )
