@@ -1,0 +1,45 @@
+from manim import *
+
+class TerrainAnimation(ThreeDScene):
+    def construct(self):
+        # Set camera angle
+        self.set_camera_orientation(phi=60 * DEGREES, theta=30 * DEGREES)
+
+        # Add 3D axes for reference
+        axes = ThreeDAxes()
+        self.add(axes)
+
+        # Define the new terrain shape
+        def height_func(x, y):
+            return 2 * np.exp(- (x**2 + y**2) / 4) + 1.5 * np.exp(- ((x-2)**2 + (y-2)**2) / 2) + 1.5 * np.exp(- ((x+2)**2 + (y+2)**2) / 2)
+
+        # Create the surface
+        surface = Surface(
+            lambda u, v: np.array([u, v, height_func(u, v)]),
+            u_range=[-3, 3],
+            v_range=[-3, 3],
+            resolution=(20, 20),
+        )
+
+        # Get min and max heights
+        all_z = [vertex[2] for face in surface for vertex in face.get_points()]
+        z_min = min(all_z)
+        z_max = max(all_z)
+
+        # Color each face from blue to green
+        for face in surface:
+            vertices = face.get_points()
+            z_values = [vertex[2] for vertex in vertices]
+            z_avg = sum(z_values) / len(z_values)
+            normalized_z = (z_avg - z_min) / (z_max - z_min)
+            color = interpolate_color(BLUE, GREEN, normalized_z)
+            face.set_fill(color, opacity=1)
+            face.set_stroke(opacity=0)  # No mesh lines
+
+        # Add the terrain to the scene
+        self.add(surface)
+
+        # Rotate the camera for 10 seconds
+        self.begin_ambient_camera_rotation(rate=0.1)
+        self.wait(10)
+        self.stop_ambient_camera_rotation()
