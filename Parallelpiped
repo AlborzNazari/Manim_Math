@@ -1,0 +1,53 @@
+from manim import *
+import numpy as np
+
+class ParallelepipedAnimation(ThreeDScene):
+    def construct(self):
+        self.set_camera_orientation(phi=60 * DEGREES, theta=30 * DEGREES)
+        axes = ThreeDAxes()
+        self.add(axes)
+
+        # Original vertices and scaling
+        original_vertices = [
+            np.array([0, 0, 0]),
+            np.array([1, 0, 0]),
+            np.array([0, 1, 0]),
+            np.array([0.5, 0.5, 1]),
+            np.array([1, 1, 0]),
+            np.array([1.5, 0.5, 1]),
+            np.array([0.5, 1.5, 1]),
+            np.array([1.5, 1.5, 1])
+        ]
+        
+        center = np.array([0.75, 0.75, 0.5])
+        scale_factor = 2.5
+        vertices = [(v - center) * scale_factor for v in original_vertices]
+
+        faces = [
+            [0, 1, 4, 2], [3, 5, 7, 6],
+            [0, 1, 5, 3], [2, 4, 7, 6],
+            [0, 2, 6, 3], [1, 4, 7, 5]
+        ]
+
+        def get_color(z):
+            # Enhanced gradient using RGB interpolation
+            normalized_z = (z + 1.25) / 2.5
+            return interpolate_color(
+                BLUE_E,  # Darker blue
+                GREEN_E, # Darker green
+                normalized_z
+            )
+
+        polygons = VGroup()
+        for face in faces:
+            points = [vertices[i] for i in face]
+            colors = [get_color(p[2]) for p in points]
+            poly = Polygon(*points)
+            poly.set_fill(colors, opacity=1)
+            poly.set_stroke(WHITE, width=1, opacity=0.5)
+            polygons.add(poly)
+
+        self.add(polygons)
+        self.begin_ambient_camera_rotation(rate=0.1)
+        self.wait(10)
+        self.stop_ambient_camera_rotation()
