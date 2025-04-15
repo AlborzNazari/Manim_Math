@@ -1,0 +1,82 @@
+from manim import *
+
+class CongruentTriangles(Scene):
+    def construct(self):
+        # Define smaller, centered triangles
+        triangle_A = Polygon(
+            [-3, -1, 0], [0, -1, 0], [-1.5, 1, 0],  # Smaller coordinates
+            color=BLUE, fill_color=BLUE, fill_opacity=0.3
+        ).set_stroke(width=3)
+        
+        triangle_B = Polygon(
+            [2, -1, 0], [5, -1, 0], [3.5, 1, 0],  # Shifted right, same shape
+            color=GREEN, fill_color=GREEN, fill_opacity=0.3
+        ).set_stroke(width=3)
+
+        # Vertex labels for clarity
+        label_A1 = Dot([-3, -1, 0], color=WHITE).scale(0.5)
+        label_A2 = Dot([0, -1, 0], color=WHITE).scale(0.5)
+        label_A3 = Dot([-1.5, 1, 0], color=WHITE).scale(0.5)
+        label_B1 = Dot([2, -1, 0], color=WHITE).scale(0.5)
+        label_B2 = Dot([5, -1, 0], color=WHITE).scale(0.5)
+        label_B3 = Dot([3.5, 1, 0], color=WHITE).scale(0.5)
+        labels = VGroup(label_A1, label_A2, label_A3, label_B1, label_B2, label_B3)
+
+        # Highlighting parts for SAS
+        side_A1 = Line([-3, -1, 0], [0, -1, 0], color=RED, stroke_width=5)
+        side_A2 = Line([-3, -1, 0], [-1.5, 1, 0], color=RED, stroke_width=5)
+        side_B1 = Line([2, -1, 0], [5, -1, 0], color=RED, stroke_width=5)
+        side_B2 = Line([2, -1, 0], [3.5, 1, 0], color=RED, stroke_width=5)
+        angle_A = Arc(radius=0.7, start_angle=0, angle=PI/4, color=BLUE, stroke_width=5).move_to([-3, -1, 0])
+        angle_B = Arc(radius=0.7, start_angle=0, angle=PI/4, color=BLUE, stroke_width=5).move_to([2, -1, 0])
+
+        # Animation sequence
+        # Step 1: Show triangles
+        self.play(FadeIn(triangle_A), FadeIn(triangle_B), FadeIn(labels))
+        text1 = Text("Two triangles to compare").to_edge(UP).scale(0.8)
+        self.play(Write(text1))
+        self.wait(1)
+
+        # Step 2: Highlight first equal sides
+        self.play(Create(side_A1), Create(side_B1))
+        text2 = Text("First pair of equal sides").to_edge(UP).scale(0.8)
+        self.play(ReplacementTransform(text1, text2))
+        self.wait(1)
+
+        # Step 3: Highlight second equal sides
+        self.play(Create(side_A2), Create(side_B2))
+        text3 = Text("Second pair of equal sides").to_edge(UP).scale(0.8)
+        self.play(ReplacementTransform(text2, text3))
+        self.wait(1)
+
+        # Step 4: Highlight equal angles
+        self.play(Create(angle_A), Create(angle_B))
+        text4 = Text("Equal included angles").to_edge(UP).scale(0.8)
+        self.play(ReplacementTransform(text3, text4))
+        self.wait(1)
+
+        # Step 5: Explain SAS
+        text5 = Text("By SAS, they are congruent").to_edge(UP).scale(0.8)
+        self.play(ReplacementTransform(text4, text5))
+        self.wait(1)
+
+        # Step 6: Show congruence by overlap
+        B_copy = triangle_B.copy().set_opacity(0.5)
+        label_B1_copy = label_B1.copy()
+        label_B2_copy = label_B2.copy()
+        label_B3_copy = label_B3.copy()
+        self.play(
+            B_copy.animate.move_to(triangle_A.get_center()),
+            label_B1_copy.animate.move_to(label_A1.get_center()),
+            label_B2_copy.animate.move_to(label_A2.get_center()),
+            label_B3_copy.animate.move_to(label_A3.get_center()),
+        )
+        text6 = Text("Triangles coincide perfectly").to_edge(UP).scale(0.8)
+        self.play(ReplacementTransform(text5, text6))
+        self.wait(1)
+
+        # Step 7: Fade out copy to show original
+        self.play(FadeOut(B_copy), FadeOut(label_B1_copy), FadeOut(label_B2_copy), FadeOut(label_B3_copy))
+        text7 = Text("Thus, they are congruent").to_edge(UP).scale(0.8)
+        self.play(ReplacementTransform(text6, text7))
+        self.wait(2)
